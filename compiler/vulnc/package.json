@@ -1,0 +1,18 @@
+{
+  "name": "@viridis-security/vulnc",
+  "version": "0.1.0",
+  "description": "Security compiler for VulnCanon. Validates that a vulnerability theorem entry is a compiled artifact, not a hypothesis.",
+  "bin": {
+    "vulnc": "bin/vulnc.js"
+  },
+  "scripts": {
+    "check": "node bin/vulnc.js check",
+    "check-all": "node bin/vulnc.js check-all"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "license": "Apache-2.0",
+  "author": "Viridis Security",
+  "dependencies": {}
+}

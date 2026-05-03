@@ -1,0 +1,30 @@
+# Node
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Editor / OS
+.DS_Store
+.idea/
+.vscode/
+*.swp
+
+# Scan outputs (responsible-disclosure protected — never publish)
+reports/scans/
+reports/stress-tests/
+
+# Local env / secrets — never commit
+.env
+.env.local
+.env.production
+*.key
+*.pem
+
+# Build artifacts
+dist/
+build/
+
+# Coverage
+coverage/
+*.lcov

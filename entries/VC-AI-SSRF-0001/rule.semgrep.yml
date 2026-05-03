@@ -1,0 +1,35 @@
+rules:
+  - id: vulncanon-ai-ssrf-0001-fetch-without-host-guard
+    message: |
+      Outbound fetch in agent tool with no SSRF guard. The URL argument is
+      caller-controlled. VC-AI-SSRF-0001: agent-coerced SSRF to internal /
+      cloud-metadata endpoints.
+    severity: ERROR
+    languages: [javascript, typescript]
+    metadata:
+      canon_id: VC-AI-SSRF-0001
+      cwe: "CWE-918"
+      owasp_llm: "LLM02"
+      references:
+        - https://canon.viridis.security/entries/VC-AI-SSRF-0001
+    pattern-either:
+      - pattern: |
+          fetch($URL)
+      - pattern: |
+          fetch($URL, ...)
+      - pattern: |
+          axios.get($URL)
+      - pattern: |
+          axios.post($URL, ...)
+      - pattern: |
+          http.get($URL, ...)
+      - pattern: |
+          got($URL)
+    pattern-not-inside: |
+      assertSafeUrl(...);
+      ...
+    pattern-not-inside: |
+      if (...isPrivateIP(...)) { ... }
+      ...
+    pattern-not-inside: |
+      safeFetch(...)

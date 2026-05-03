@@ -1,0 +1,54 @@
+{
+  "id": "VC-AI-SECRETS-0001",
+  "title": "Session Secrets Leaked via Tool Call Arguments",
+  "class": "AI Agent Memory Disclosure",
+  "status": "accepted",
+  "severity": "high",
+  "version": "0.1.0",
+  "created_at": "2026-04-27",
+  "invariant": {
+    "id": "secrets_must_not_appear_in_tool_call_args",
+    "statement": "Session secrets (API keys, OAuth tokens, signed credentials, refresh tokens) must never appear verbatim in the argument JSON of a tool call. Tools must reference secrets by an opaque server-side handle that the dispatcher dereferences before invocation."
+  },
+  "preconditions": {
+    "agent_holds_session_secrets": true,
+    "tool_call_args_are_serialized_to_logs_or_traces": true,
+    "secrets_passed_directly_in_args": true,
+    "no_capability_handle_indirection": true
+  },
+  "claim": {
+    "statement": "If session secrets appear in tool call argument JSON, they will land in observability sinks (request logs, distributed traces, error reports, audit trails, third-party LLM provider transcripts) where the threat surface is far broader than the agent runtime. A read of any of those sinks — including by anyone with access to the tracing system — yields the secrets."
+  },
+  "evidence": {
+    "mode": "fixture_plus_static_plus_test",
+    "vulnerable_fixture": "vulnerable_fixture",
+    "patched_fixture": "patched_fixture",
+    "static_rule": "rule.semgrep.yml",
+    "test_runner": "node exploit.test.js"
+  },
+  "detection": {
+    "signature_regex": "(?:apiKey|api_key|access_token|accessToken|refresh_token|refreshToken|bearer|secret_key|client_secret)\\s*[:=]\\s*['\"`](?:sk-|sk_live_|sk_test_|AKIA|ghp_|xox[abprs]-|Bearer\\s+)[A-Za-z0-9._\\-]{16,}",
+    "exclude_regex": "(?:apiKeyRef|api_key_ref|secretRef|secret_ref|capability_handle|vault_handle|process\\.env|os\\.getenv|getSecret\\(|\\$\\{[A-Z_]+\\}|formData\\.get|req\\.body|validatedData)",
+    "confidence": "high",
+    "languages": ["javascript", "typescript", "python"]
+  },
+  "mitigation": {
+    "file": "mitigation.md",
+    "summary": "Secrets live in a server-side capability vault. Tools receive an opaque handle (capability:abc123) in their args. The dispatcher dereferences handles immediately before invoking the tool implementation; the dereferenced secret never crosses the trace/log boundary. Loggers redact handle dereferences. The LLM context never contains a raw secret; it sees only handles."
+  },
+  "reward": {
+    "eligible": true,
+    "base_reward_tier": "high",
+    "royalty_eligible": true
+  },
+  "contributor": {
+    "submitter_id": "viridis-security-ai-agent",
+    "validator_id": "viridis-security-ai-agent",
+    "canonical_founder": "Viridis Security"
+  },
+  "references": [
+    "OWASP LLM06: Sensitive Information Disclosure",
+    "CWE-532: Insertion of Sensitive Information into Log File",
+    "Capability-based security (Dennis & Van Horn 1966)"
+  ]
+}

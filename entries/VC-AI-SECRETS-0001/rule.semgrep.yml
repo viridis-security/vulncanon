@@ -1,0 +1,32 @@
+rules:
+  - id: vulncanon-ai-secrets-0001-secret-in-tool-args
+    message: |
+      Tool call argument carries a secret-shaped value (apiKey / secret /
+      bearer / access_token etc.). Tools must use capability handles, not
+      raw secrets. VC-AI-SECRETS-0001 — secrets in observability sinks.
+    severity: ERROR
+    languages: [javascript, typescript]
+    metadata:
+      canon_id: VC-AI-SECRETS-0001
+      cwe: "CWE-532"
+      owasp_llm: "LLM06"
+      references:
+        - https://canon.viridis.security/entries/VC-AI-SECRETS-0001
+    pattern-either:
+      - pattern: |
+          { ..., apiKey: $V, ... }
+      - pattern: |
+          { ..., api_key: $V, ... }
+      - pattern: |
+          { ..., access_token: $V, ... }
+      - pattern: |
+          { ..., bearer: $V, ... }
+      - pattern: |
+          { ..., secret: $V, ... }
+    pattern-not:
+      - pattern: |
+          { ..., apiKey: process.env.$E, ... }
+      - pattern: |
+          { ..., apiKeyRef: $V, ... }
+      - pattern: |
+          { ..., secretRef: $V, ... }

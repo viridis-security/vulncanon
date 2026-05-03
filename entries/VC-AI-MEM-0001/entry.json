@@ -1,0 +1,53 @@
+{
+  "id": "VC-AI-MEM-0001",
+  "title": "Cross-Tenant Memory Disclosure in Agent Long-Term Store",
+  "class": "AI Agent Memory Disclosure",
+  "status": "accepted",
+  "severity": "high",
+  "version": "0.1.0",
+  "created_at": "2026-04-27",
+  "invariant": {
+    "id": "memory_access_requires_owner_match",
+    "statement": "An agent must not return content from its long-term memory store to any actor whose principal id does not equal the owner principal id of that memory record."
+  },
+  "preconditions": {
+    "agent_has_long_term_memory": true,
+    "memory_records_have_owner_field": true,
+    "memory_lookup_filters_by_query_only": true,
+    "no_owner_filter_on_read_path": true
+  },
+  "claim": {
+    "statement": "If the memory read path filters records only by query similarity (e.g., vector search) and not by owner equality with the requesting principal, an actor can retrieve another tenant's stored memories — including secrets, PII, and prior conversation context."
+  },
+  "evidence": {
+    "mode": "fixture_plus_static_plus_test",
+    "vulnerable_fixture": "vulnerable_fixture",
+    "patched_fixture": "patched_fixture",
+    "static_rule": "rule.semgrep.yml",
+    "test_runner": "node exploit.test.js"
+  },
+  "detection": {
+    "signature_regex": "\\b(?:memory|memoryStore|memory_store|memstore|long_term_memory|vectorStore|vector_store|store)\\.(?:search|recall|query|retrieve|fetch)\\s*\\(\\s*[^,)]+\\s*\\)",
+    "exclude_regex": "(?:ownerEquals|owner_equals|owner_principal_id|filter_by_owner|tenant_id\\s*=|principal_id\\s*=|where\\s*owner|RLS|row_level_security)",
+    "confidence": "high",
+    "languages": ["javascript", "typescript", "python"]
+  },
+  "mitigation": {
+    "file": "mitigation.md",
+    "summary": "Every memory read must include an owner-equality predicate against the authenticated principal. Owner is bound at write time from the verified session, not from caller-supplied input. Tenant isolation is a database-level invariant, not an LLM policy."
+  },
+  "reward": {
+    "eligible": true,
+    "base_reward_tier": "high",
+    "royalty_eligible": true
+  },
+  "contributor": {
+    "submitter_id": "viridis-security-ai-agent",
+    "validator_id": "viridis-security-ai-agent",
+    "canonical_founder": "Viridis Security"
+  },
+  "references": [
+    "OWASP LLM06: Sensitive Information Disclosure",
+    "CWE-639: Authorization Bypass Through User-Controlled Key"
+  ]
+}

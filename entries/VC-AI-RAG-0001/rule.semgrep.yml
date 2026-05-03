@@ -1,0 +1,25 @@
+rules:
+  - id: vulncanon-ai-rag-0001-untrusted-retrieval-in-system-prompt
+    message: |
+      Retrieved content concatenated into an instruction-channel string
+      (system / instructions / prompt). This is the VC-AI-RAG-0001 pattern:
+      indirect prompt injection via the retrieval corpus.
+    severity: ERROR
+    languages: [javascript, typescript]
+    metadata:
+      canon_id: VC-AI-RAG-0001
+      cwe: "CWE-77"
+      owasp_llm: "LLM01"
+      references:
+        - https://canon.viridis.security/entries/VC-AI-RAG-0001
+    pattern-either:
+      - pattern: |
+          const $PROMPT = `...${$DOCS.join(...)}...`
+      - pattern: |
+          const $PROMPT = "..." + $DOCS.join(...)
+      - pattern: |
+          const systemPrompt = `...${$DOCS}...`
+      - pattern: |
+          const instructions = `...${$DOCS}...`
+      - pattern: |
+          messages.push({ role: "system", content: `...${$DOCS}...` })

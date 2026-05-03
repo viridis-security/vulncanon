@@ -1,0 +1,22 @@
+rules:
+  - id: vulncanon-ai-chain-0001-delegation-without-capability-token
+    message: |
+      Multi-agent delegation without a capability token. The callee will
+      authorize against its own permissions, not the intersection with the
+      caller's. VC-AI-CHAIN-0001 — confused deputy via delegation.
+    severity: ERROR
+    languages: [javascript, typescript]
+    metadata:
+      canon_id: VC-AI-CHAIN-0001
+      cwe: "CWE-441"
+      owasp_llm: "LLM07"
+      references:
+        - https://canon.viridis.security/entries/VC-AI-CHAIN-0001
+    pattern-either:
+      - pattern: $AGENT.dispatch($CALL)
+      - pattern: $AGENT.delegate($CALL)
+      - pattern: delegate($AGENT, $CALL, ...)
+    pattern-not:
+      - pattern: $AGENT.dispatch($CALL, { delegationToken: $T })
+      - pattern: $AGENT.dispatch($CALL, { capability_token: $T })
+      - pattern: delegate($AGENT, $CALL, ..., $TOKEN)

@@ -1,0 +1,53 @@
+{
+  "id": "VC-AI-CHAIN-0001",
+  "title": "Multi-Agent Delegation Expands Permission Scope",
+  "class": "AI Agent Authorization Failure",
+  "status": "accepted",
+  "severity": "high",
+  "version": "0.1.0",
+  "created_at": "2026-04-27",
+  "invariant": {
+    "id": "delegated_call_intersects_permissions",
+    "statement": "When agent A delegates a task to agent B, the effective permissions for the delegated call must be the intersection of A's and B's permissions, never B's permissions alone."
+  },
+  "preconditions": {
+    "system_has_multiple_agents": true,
+    "agents_can_delegate_tasks_to_each_other": true,
+    "delegated_call_uses_callee_permissions_only": true,
+    "no_capability_token_passed_with_delegation": true
+  },
+  "claim": {
+    "statement": "If a delegated call from agent A to agent B authorizes against B's own permission set rather than the intersection of A's and B's, then any user who can prompt A can leverage A as a stepping stone to invoke any tool B has — even tools A is not authorized to call directly. This is privilege escalation by delegation."
+  },
+  "evidence": {
+    "mode": "fixture_plus_static_plus_test",
+    "vulnerable_fixture": "vulnerable_fixture",
+    "patched_fixture": "patched_fixture",
+    "static_rule": "rule.semgrep.yml",
+    "test_runner": "node exploit.test.js"
+  },
+  "detection": {
+    "signature_regex": "\\b(?:delegate|delegateTo|hand_off|handoff|sub_agent|subAgent|spawn_agent)\\s*\\(",
+    "exclude_regex": "(?:mintDelegationToken|verifyDelegationToken|delegationToken\\s*[:=]|capability_token\\s*[:=]|capabilityToken\\s*[:=]|effective_permissions\\s*[:=]|effectivePermissions\\s*[:=])",
+    "confidence": "medium",
+    "languages": ["javascript", "typescript", "python"]
+  },
+  "mitigation": {
+    "file": "mitigation.md",
+    "summary": "Every delegation passes a capability token bound to the caller's permissions. The callee's dispatcher computes effective_permissions = caller_permissions ∩ callee_permissions for the delegated call. Tokens are short-lived, signed, and bound to a specific tool name. Without a valid token, the callee refuses the delegation."
+  },
+  "reward": {
+    "eligible": true,
+    "base_reward_tier": "high",
+    "royalty_eligible": true
+  },
+  "contributor": {
+    "submitter_id": "viridis-security-ai-agent",
+    "validator_id": "viridis-security-ai-agent",
+    "canonical_founder": "Viridis Security"
+  },
+  "references": [
+    "OWASP LLM07: Insecure Plugin Design (delegation variant)",
+    "Capability-based security — confused deputy problem (Hardy 1988)"
+  ]
+}

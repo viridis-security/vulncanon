@@ -1,0 +1,30 @@
+rules:
+  - id: vulncanon-ai-api-0001-post-without-egress-allowlist
+    message: |
+      Outbound POST with caller-supplied URL and no egress allowlist /
+      data classification check. VC-AI-API-0001 — exfiltration sink.
+    severity: ERROR
+    languages: [javascript, typescript]
+    metadata:
+      canon_id: VC-AI-API-0001
+      cwe: "CWE-200"
+      owasp_llm: "LLM06"
+      references:
+        - https://canon.viridis.security/entries/VC-AI-API-0001
+    pattern-either:
+      - pattern: |
+          fetch($URL, { method: "POST", body: $BODY })
+      - pattern: |
+          fetch($URL, { method: 'POST', body: $BODY })
+      - pattern: |
+          axios.post($URL, $BODY)
+      - pattern: |
+          http.post($URL, $BODY, ...)
+    pattern-not-inside: |
+      assertAllowedDestination(...)
+      ...
+    pattern-not-inside: |
+      if (...isAllowlistedHost(...)) { ... }
+      ...
+    pattern-not-inside: |
+      safePost(...)

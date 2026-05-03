@@ -1,0 +1,24 @@
+rules:
+  - id: vulncanon-ai-prompt-0001-output-without-strip-filter
+    message: |
+      Model output returned to the user without passing through an output
+      strip layer. VC-AI-PROMPT-0001: system instruction disclosure surface.
+    severity: WARNING
+    languages: [javascript, typescript]
+    metadata:
+      canon_id: VC-AI-PROMPT-0001
+      cwe: "CWE-200"
+      owasp_llm: "LLM06"
+      references:
+        - https://canon.viridis.security/entries/VC-AI-PROMPT-0001
+    pattern-either:
+      - pattern: |
+          return $LLM.complete(...)
+      - pattern: |
+          return await $LLM.complete(...)
+      - pattern: |
+          res.send($LLM.complete(...))
+    pattern-not:
+      - pattern: stripSystemContent($LLM.complete(...))
+      - pattern: outputFilter($LLM.complete(...))
+      - pattern: redactSystem($LLM.complete(...))

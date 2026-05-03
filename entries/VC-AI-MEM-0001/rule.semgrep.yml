@@ -1,0 +1,21 @@
+rules:
+  - id: vulncanon-ai-mem-0001-memory-search-without-owner-filter
+    message: |
+      Agent memory store searched without an owner predicate.
+      VC-AI-MEM-0001: cross-tenant memory disclosure pattern.
+    severity: ERROR
+    languages: [javascript, typescript]
+    metadata:
+      canon_id: VC-AI-MEM-0001
+      cwe: "CWE-639"
+      owasp_llm: "LLM06"
+      references:
+        - https://canon.viridis.security/entries/VC-AI-MEM-0001
+    pattern-either:
+      - pattern: $STORE.search($QUERY)
+      - pattern: $STORE.recall($QUERY)
+      - pattern: $STORE.query($QUERY)
+    pattern-not:
+      - pattern: $STORE.search($QUERY, { ownerEquals: $X })
+      - pattern: $STORE.search($QUERY, { owner: $X })
+      - pattern: $STORE.recall($QUERY, { ownerEquals: $X })

@@ -1,0 +1,54 @@
+{
+  "id": "VC-AI-SSRF-0001",
+  "title": "Agent-Coerced SSRF to Internal and Metadata Endpoints",
+  "class": "AI Agent Trust Boundary Crossing",
+  "status": "accepted",
+  "severity": "critical",
+  "version": "0.1.0",
+  "created_at": "2026-04-27",
+  "invariant": {
+    "id": "outbound_fetch_must_reject_internal_targets",
+    "statement": "An agent's outbound HTTP tool must reject requests targeting private, link-local, loopback, or cloud metadata addresses, including after DNS resolution and HTTP redirects."
+  },
+  "preconditions": {
+    "agent_has_url_fetch_tool": true,
+    "url_destination_is_caller_or_prompt_controlled": true,
+    "no_host_validation_before_fetch": true,
+    "no_post_resolution_ip_check": true
+  },
+  "claim": {
+    "statement": "If an agent's URL-fetch tool does not validate the destination host (and re-validate after DNS resolution and after each redirect), an attacker who controls any prompt that reaches the agent can coerce the agent into fetching cloud-metadata endpoints (169.254.169.254, metadata.google.internal), internal services (private RFC1918 ranges, *.consul, *.svc.cluster.local), or localhost-bound debug surfaces — exfiltrating IAM credentials, internal config, or pivoting to lateral movement."
+  },
+  "evidence": {
+    "mode": "fixture_plus_static_plus_test",
+    "vulnerable_fixture": "vulnerable_fixture",
+    "patched_fixture": "patched_fixture",
+    "static_rule": "rule.semgrep.yml",
+    "test_runner": "node exploit.test.js"
+  },
+  "detection": {
+    "signature_regex": "\\b(?:fetch|axios|httpx|got)(?:\\.(?:get|post|put|delete|request))?\\s*\\(\\s*[^)]*(?:url|target|endpoint|href|link)\\b",
+    "exclude_regex": "(?:assertSafeUrl|isPrivateIP|is_private_ip|reject_internal|ssrf_guard|validate_outbound_host|safeFetch|safe_fetch)",
+    "confidence": "low",
+    "languages": ["javascript", "typescript", "python"]
+  },
+  "mitigation": {
+    "file": "mitigation.md",
+    "summary": "Wrap every outbound fetch in a guard that resolves the host, rejects RFC1918, link-local (169.254.0.0/16), loopback (127.0.0.0/8), IPv6 ULA/loopback, and known cloud-metadata hostnames. Re-validate after each redirect. Prefer an allowlist of known external destinations over a blocklist. The agent's URL-fetch tool is the only path; no second tool may issue HTTP."
+  },
+  "reward": {
+    "eligible": true,
+    "base_reward_tier": "critical",
+    "royalty_eligible": true
+  },
+  "contributor": {
+    "submitter_id": "viridis-security-ai-agent",
+    "validator_id": "viridis-security-ai-agent",
+    "canonical_founder": "Viridis Security"
+  },
+  "references": [
+    "OWASP LLM02: Insecure Output Handling (SSRF variant)",
+    "Capital One 2019 breach — IMDSv1 SSRF via WAF",
+    "OWASP API Top 10 — API7 SSRF"
+  ]
+}

@@ -1,0 +1,39 @@
+rules:
+  - id: vulncanon-ai-tool-0001-privileged-tool-no-gate
+    message: |
+      Privileged tool dispatched without a permission gate.
+      A tool registry lookup followed by .run(/.execute(/.call( without
+      a preceding session.permissions check is the VC-AI-TOOL-0001 pattern.
+    severity: ERROR
+    languages: [javascript, typescript]
+    metadata:
+      canon_id: VC-AI-TOOL-0001
+      cwe: "CWE-862"
+      owasp_llm: "LLM07"
+      references:
+        - https://canon.viridis.security/entries/VC-AI-TOOL-0001
+    patterns:
+      - pattern-either:
+          - pattern: |
+              const $TOOL = $TOOLS[$NAME];
+              ...
+              $TOOL.run(...)
+          - pattern: |
+              const $TOOL = $TOOLS[$NAME];
+              ...
+              $TOOL.execute(...)
+          - pattern: |
+              let $TOOL = $TOOLS[$NAME];
+              ...
+              $TOOL.run(...)
+      - pattern-not-inside: |
+          if (...$SESSION.permissions...) {
+            ...
+          }
+      - pattern-not-inside: |
+          if (...$SESSION.can(...)) {
+            ...
+          }
+      - pattern-not-inside: |
+          assertPermission(...);
+          ...

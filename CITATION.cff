@@ -1,0 +1,21 @@
+cff-version: 1.2.0
+title: "VulnCanon: A Theorem-Backed Catalog of AI-Agent Vulnerability Classes"
+message: "If you use this catalog, please cite it using the metadata below."
+type: software
+authors:
+  - family-names: "Hart"
+    given-names: "Justin"
+    affiliation: "Viridis Security"
+    email: "viridissecurity1@gmail.com"
+repository-code: "https://github.com/viridis-security/vulncanon"
+url: "https://viridis-security.github.io/vulncanon"
+license: Apache-2.0
+keywords:
+  - "ai security"
+  - "ai agents"
+  - "llm security"
+  - "vulnerability database"
+  - "responsible disclosure"
+  - "prompt injection"
+  - "ssrf"
+  - "tool calling"

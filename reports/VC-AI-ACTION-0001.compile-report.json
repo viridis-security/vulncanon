@@ -1,0 +1,49 @@
+{
+  "vulnc_version": "0.1.0",
+  "entry_id": "VC-AI-ACTION-0001",
+  "entry_path": "/tmp/vulncanon-public/entries/VC-AI-ACTION-0001",
+  "started_at": "2026-05-03T09:04:27.575Z",
+  "finished_at": "2026-05-03T09:04:27.602Z",
+  "overall_status": "accepted",
+  "checks": {
+    "schema": {
+      "status": "pass",
+      "message": "entry.json conforms to vulnerability schema"
+    },
+    "structure": {
+      "status": "pass",
+      "message": "all required artifacts present"
+    },
+    "vulnerable_fixture_fails": {
+      "status": "pass",
+      "message": "vulnerable fixture failed (exit 1) — invariant violation demonstrated",
+      "details": {
+        "exitCode": 1,
+        "stdoutTail": ""
+      }
+    },
+    "patched_fixture_passes": {
+      "status": "pass",
+      "message": "patched fixture passed (exit 0) — invariant restored",
+      "details": {
+        "stdoutTail": "OK — invariant holds\n"
+      }
+    },
+    "static_rule_valid": {
+      "status": "pass",
+      "message": "rule.semgrep.yml is structurally valid (semgrep CLI not installed — full validate skipped)"
+    },
+    "mitigation_present": {
+      "status": "pass",
+      "message": "mitigation.md present (1684 chars)"
+    },
+    "duplicate_check": {
+      "status": "pass",
+      "message": "no duplicate ids found in canon"
+    },
+    "safety_scan": {
+      "status": "pass",
+      "message": "safety scan clean — no forbidden patterns found"
+    }
+  }
+}

@@ -1,0 +1,54 @@
+{
+  "id": "VC-AI-API-0001",
+  "title": "Private Session Data Sent to Non-Allowlisted External API",
+  "class": "AI Agent Trust Boundary Crossing",
+  "status": "accepted",
+  "severity": "high",
+  "version": "0.1.0",
+  "created_at": "2026-04-27",
+  "invariant": {
+    "id": "private_data_must_not_leave_to_unallowlisted_hosts",
+    "statement": "An agent must not include data classified as private (PII, session secrets, customer records, internal config) in an outbound request whose destination host is not on a fixed allowlist."
+  },
+  "preconditions": {
+    "agent_has_arbitrary_http_post_tool": true,
+    "outbound_destination_is_caller_or_prompt_controlled": true,
+    "no_data_classification_at_source": true,
+    "no_egress_allowlist": true
+  },
+  "claim": {
+    "statement": "If the agent's outbound HTTP tool accepts a caller-supplied URL and the request body is constructed by the LLM (or by another tool that returns user data), an attacker who controls the prompt can name an external destination — `attacker.example`, a webhook collector, a public Pastebin — and the agent will exfiltrate session data to it."
+  },
+  "evidence": {
+    "mode": "fixture_plus_static_plus_test",
+    "vulnerable_fixture": "vulnerable_fixture",
+    "patched_fixture": "patched_fixture",
+    "static_rule": "rule.semgrep.yml",
+    "test_runner": "node exploit.test.js"
+  },
+  "detection": {
+    "signature_regex": "(?:fetch|axios\\.(?:post|put|patch)|requests\\.(?:post|put|patch)|httpx\\.(?:post|put|patch))\\s*\\([^)]*\\b(?:url|target|endpoint|webhook|callback)\\b[^)]*(?:body|data|json|method:\\s*['\"](?:POST|PUT|PATCH))",
+    "exclude_regex": "(?:isAllowlistedHost|outboundAllowlist|egress_allowlist|assertAllowedDestination|assertNotPrivate|classifyData|safePost|safe_post)",
+    "confidence": "medium",
+    "languages": ["javascript", "typescript", "python"]
+  },
+  "mitigation": {
+    "file": "mitigation.md",
+    "summary": "Outbound HTTP from the agent goes through a single safePost wrapper that (1) checks the destination host against a fixed allowlist, (2) classifies the request body and rejects bodies containing private-tagged fields when the destination is not on an internal allowlist, (3) logs every outbound call with destination and content-class. Prefer per-tool destination allowlists (e.g., the Stripe tool can only POST to api.stripe.com) over a global one."
+  },
+  "reward": {
+    "eligible": true,
+    "base_reward_tier": "high",
+    "royalty_eligible": true
+  },
+  "contributor": {
+    "submitter_id": "viridis-security-ai-agent",
+    "validator_id": "viridis-security-ai-agent",
+    "canonical_founder": "Viridis Security"
+  },
+  "references": [
+    "OWASP LLM06: Sensitive Information Disclosure",
+    "OWASP LLM02: Insecure Output Handling",
+    "MITRE ATLAS: AML.T0024 — Exfiltration via API"
+  ]
+}

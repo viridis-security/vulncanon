@@ -1,0 +1,29 @@
+rules:
+  - id: vulncanon-ai-action-0001-irreversible-no-confirmation
+    message: |
+      Irreversible tool dispatched without a confirmation_token check.
+      VC-AI-ACTION-0001: single-turn execution of an unrecoverable side effect.
+    severity: ERROR
+    languages: [javascript, typescript]
+    metadata:
+      canon_id: VC-AI-ACTION-0001
+      cwe: "CWE-841"
+      owasp_llm: "LLM08"
+      references:
+        - https://canon.viridis.security/entries/VC-AI-ACTION-0001
+    pattern-either:
+      - pattern: |
+          if ($TOOL.irreversible) {
+            ...
+            $TOOL.run(...)
+            ...
+          }
+      - pattern: |
+          $TOOL.run(...)
+    pattern-not-inside: |
+      if (...$CONFIRMATION_TOKEN...) {
+        ...
+      }
+    pattern-not-inside: |
+      verifyConfirmation(...);
+      ...

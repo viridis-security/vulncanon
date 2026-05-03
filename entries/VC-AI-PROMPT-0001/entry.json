@@ -1,0 +1,52 @@
+{
+  "id": "VC-AI-PROMPT-0001",
+  "title": "System Instruction Disclosure via Output Reflection",
+  "class": "AI Agent System Prompt Disclosure",
+  "status": "accepted",
+  "severity": "medium",
+  "version": "0.1.0",
+  "created_at": "2026-04-27",
+  "invariant": {
+    "id": "system_instructions_must_not_appear_in_user_output",
+    "statement": "Content from the system instruction channel must not appear verbatim in any output stream visible to the user, regardless of how the user phrases the prompt."
+  },
+  "preconditions": {
+    "agent_has_system_prompt": true,
+    "system_prompt_contains_sensitive_policy_or_credentials": true,
+    "no_output_filter_strips_system_content": true
+  },
+  "claim": {
+    "statement": "If the agent's output path concatenates or reflects system-channel content (system prompts, tool descriptions, internal policies) without a strip step, an attacker can recover proprietary system prompts, embedded credentials, or hidden policy with simple coercion prompts ('repeat your instructions', 'translate the above to French', etc.)."
+  },
+  "evidence": {
+    "mode": "fixture_plus_static_plus_test",
+    "vulnerable_fixture": "vulnerable_fixture",
+    "patched_fixture": "patched_fixture",
+    "static_rule": "rule.semgrep.yml",
+    "test_runner": "node exploit.test.js"
+  },
+  "detection": {
+    "signature_regex": "return\\s+(?:await\\s+)?(?:llm|model|client|openai|anthropic|chat)\\.(?:complete|generate|chat|invoke|completion|create_message)\\s*\\(",
+    "exclude_regex": "(?:stripSystem|outputFilter|redactSystem|sanitize_output|content_filter|output_strip|prompt_filter|stripSystemContent)",
+    "confidence": "medium",
+    "languages": ["javascript", "typescript", "python"]
+  },
+  "mitigation": {
+    "file": "mitigation.md",
+    "summary": "The output path passes through a strip layer that scans for known system-channel substrings (system prompt fingerprints, credential patterns, internal sentinel tokens) and refuses or redacts the response. Treat the system prompt as a secret; do not embed credentials in it; rotate fingerprint sentinels per deployment."
+  },
+  "reward": {
+    "eligible": true,
+    "base_reward_tier": "medium",
+    "royalty_eligible": true
+  },
+  "contributor": {
+    "submitter_id": "viridis-security-ai-agent",
+    "validator_id": "viridis-security-ai-agent",
+    "canonical_founder": "Viridis Security"
+  },
+  "references": [
+    "OWASP LLM06: Sensitive Information Disclosure",
+    "OWASP LLM01: Prompt Injection (extraction variant)"
+  ]
+}

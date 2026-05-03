@@ -1,0 +1,69 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://canon.viridis.security/schemas/compile-report.schema.json",
+  "title": "VulnCanon Compile Report",
+  "description": "Output of `vulnc check`. A compile report is the receipt that proves an entry passed every gate.",
+  "type": "object",
+  "required": [
+    "vulnc_version",
+    "entry_id",
+    "entry_path",
+    "checks",
+    "overall_status",
+    "started_at",
+    "finished_at"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "vulnc_version": { "type": "string" },
+    "entry_id": { "type": "string" },
+    "entry_path": { "type": "string" },
+    "started_at": { "type": "string", "format": "date-time" },
+    "finished_at": { "type": "string", "format": "date-time" },
+    "overall_status": {
+      "type": "string",
+      "enum": ["accepted", "rejected", "error"]
+    },
+    "checks": {
+      "type": "object",
+      "required": [
+        "schema",
+        "structure",
+        "vulnerable_fixture_fails",
+        "patched_fixture_passes",
+        "static_rule_valid",
+        "mitigation_present",
+        "duplicate_check",
+        "safety_scan"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "schema":                    { "$ref": "#/definitions/check_result" },
+        "structure":                 { "$ref": "#/definitions/check_result" },
+        "vulnerable_fixture_fails":  { "$ref": "#/definitions/check_result" },
+        "patched_fixture_passes":    { "$ref": "#/definitions/check_result" },
+        "static_rule_valid":         { "$ref": "#/definitions/check_result" },
+        "static_rule_matches":       { "$ref": "#/definitions/check_result" },
+        "mitigation_present":        { "$ref": "#/definitions/check_result" },
+        "duplicate_check":           { "$ref": "#/definitions/check_result" },
+        "safety_scan":               { "$ref": "#/definitions/check_result" },
+        "lean_compiles":             { "$ref": "#/definitions/check_result" }
+      }
+    }
+  },
+  "definitions": {
+    "check_result": {
+      "type": "object",
+      "required": ["status", "message"],
+      "additionalProperties": false,
+      "properties": {
+        "status": {
+          "type": "string",
+          "enum": ["pass", "fail", "skipped", "error"]
+        },
+        "message": { "type": "string" },
+        "details": {}
+      }
+    }
+  }
+}

@@ -1,0 +1,27 @@
+rules:
+  - id: vulncanon-ai-codeexec-0001-eval-on-tool-output
+    message: |
+      Tool output evaluated as code. eval / Function / exec on a value
+      sourced from a tool result is a remote-code-execution sink.
+      VC-AI-CODEEXEC-0001.
+    severity: ERROR
+    languages: [javascript, typescript]
+    metadata:
+      canon_id: VC-AI-CODEEXEC-0001
+      cwe: "CWE-94"
+      owasp_llm: "LLM02"
+      references:
+        - https://canon.viridis.security/entries/VC-AI-CODEEXEC-0001
+    pattern-either:
+      - pattern: eval($X.next_action)
+      - pattern: eval($X.output)
+      - pattern: eval($X.result)
+      - pattern: eval($X.content)
+      - pattern: eval($X.body)
+      - pattern: new Function($X.next_action)
+      - pattern: new Function($X.output)
+      - pattern: new Function($X.body)
+      - pattern: |
+          const $R = await $TOOL.run(...)
+          ...
+          eval($R)

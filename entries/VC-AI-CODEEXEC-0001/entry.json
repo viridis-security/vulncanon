@@ -1,0 +1,53 @@
+{
+  "id": "VC-AI-CODEEXEC-0001",
+  "title": "Untrusted Tool Output Evaluated as Code Downstream",
+  "class": "AI Agent Trust Boundary Crossing",
+  "status": "accepted",
+  "severity": "critical",
+  "version": "0.1.0",
+  "created_at": "2026-04-27",
+  "invariant": {
+    "id": "tool_output_must_not_be_evaluated_as_code",
+    "statement": "Output produced by one tool must never be evaluated as executable code, expressions, queries, or commands by a downstream tool, the agent runtime, or any code path the runtime controls."
+  },
+  "preconditions": {
+    "tool_output_can_be_attacker_influenced": true,
+    "downstream_evaluates_output_as_code_or_expression": true,
+    "no_dispatch_table_indirection": true
+  },
+  "claim": {
+    "statement": "If a downstream code path evaluates a tool's output via eval / new Function / exec / SQL string concat / shell -c, then any tool whose output an attacker can influence (RAG corpus, web fetch, filesystem read, another agent's response) becomes a remote-code-execution channel against the host running the agent."
+  },
+  "evidence": {
+    "mode": "fixture_plus_static_plus_test",
+    "vulnerable_fixture": "vulnerable_fixture",
+    "patched_fixture": "patched_fixture",
+    "static_rule": "rule.semgrep.yml",
+    "test_runner": "node exploit.test.js"
+  },
+  "detection": {
+    "signature_regex": "(?:^|[^.\\w/*])(?:eval|new\\s+Function|child_process\\.exec|child_process\\.execSync|os\\.system)\\s*\\(\\s*[^)]*\\b(?:result|output|response|content|body|next_action|plan|tool_)\\b",
+    "exclude_regex": "(?:DISPATCH_TABLE|action_handlers|ALLOWED_ACTIONS|allowed_actions|safe_dispatch|pattern\\.exec|matcher\\.exec|RegExp\\.prototype)",
+    "confidence": "high",
+    "languages": ["javascript", "typescript", "python"]
+  },
+  "mitigation": {
+    "file": "mitigation.md",
+    "summary": "Tool outputs are typed data, not code. Downstream dispatch uses a fixed allowlist table indexed by an enum-typed action name. eval / Function / exec are forbidden in the agent runtime, enforced by a lint rule and CI gate. Tool outputs that cross trust boundaries are JSON-parsed in a structured shape and validated against a schema."
+  },
+  "reward": {
+    "eligible": true,
+    "base_reward_tier": "critical",
+    "royalty_eligible": true
+  },
+  "contributor": {
+    "submitter_id": "viridis-security-ai-agent",
+    "validator_id": "viridis-security-ai-agent",
+    "canonical_founder": "Viridis Security"
+  },
+  "references": [
+    "OWASP LLM02: Insecure Output Handling",
+    "CWE-94: Improper Control of Generation of Code",
+    "Semgrep — javascript.lang.security.audit.unsafe-eval"
+  ]
+}
