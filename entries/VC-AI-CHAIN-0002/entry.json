@@ -1,0 +1,60 @@
+{
+  "id": "VC-AI-CHAIN-0002",
+  "title": "Cross-Agent State Channel Pollution",
+  "class": "AI Agent Trust Boundary Crossing",
+  "status": "accepted",
+  "severity": "high",
+  "version": "0.1.0",
+  "created_at": "2026-05-11",
+  "invariant": {
+    "id": "shared_state_provenance_required",
+    "statement": "When two or more agents share a state channel (vector DB, KV store, message queue, filesystem), reads from the channel must include cryptographic provenance binding the value to the writing agent and the user-session under whose authority it was written. Reads without provenance MUST be treated as untrusted input."
+  },
+  "preconditions": {
+    "system_has_multiple_agents": true,
+    "agents_share_a_state_channel": true,
+    "channel_does_not_record_writer_identity": true,
+    "channel_does_not_record_caller_session": true,
+    "consumer_treats_channel_reads_as_authoritative": true
+  },
+  "claim": {
+    "statement": "If agent A and agent B share a state channel C, and B reads from C without verifying the provenance of each value, then any user who can prompt A to write attacker-controlled content into C can later prompt B to read that content as authoritative state. The attack succeeds even when A and B serve different users, different tenants, or different privilege levels \u2014 because C is the actual trust boundary, not the agent identities. This is shared-channel injection, the multi-agent generalization of stored XSS."
+  },
+  "evidence": {
+    "mode": "fixture_plus_static_plus_test",
+    "vulnerable_fixture": "vulnerable_fixture",
+    "patched_fixture": "patched_fixture",
+    "static_rule": "rule.semgrep.yml",
+    "test_runner": "node exploit.test.js"
+  },
+  "detection": {
+    "signature_regex": "\\b(?:vectorStore|vectorDb|vector_db|memoryStore|memory_store|sharedMemory|shared_memory|sharedState|shared_state|messageQueue|message_queue|sharedKv|shared_kv|redis|kv\\.get|memory\\.get|memory\\.recall|context\\.recall)\\s*[\\.\\(]",
+    "exclude_regex": "(?:provenance|signed_by|writtenBy|writer_identity|writerIdentity|signature_verified|signatureVerified|verify_provenance|verifyProvenance|namespace_isolated|namespaceIsolated|tenant_scoped|tenantScoped)",
+    "confidence": "medium",
+    "languages": [
+      "javascript",
+      "typescript",
+      "python"
+    ]
+  },
+  "mitigation": {
+    "file": "mitigation.md",
+    "summary": "Every shared-channel write records {writer_agent_id, session_id, signed_at, signature_over(value)}. Every read returns the value PLUS the provenance record. Consumers MUST verify the signature, MUST check that writer_agent_id is on the consumer's allowlist of trusted writers for that namespace, AND MUST scope the read to the session/tenant the consumer is currently serving. A shared channel without provenance is a stored-injection sink."
+  },
+  "reward": {
+    "eligible": true,
+    "base_reward_tier": "high",
+    "royalty_eligible": true
+  },
+  "references": [
+    "OWASP LLM02: Insecure Output Handling (cross-context variant)",
+    "Stored XSS pattern \u2014 multi-agent generalization (Hardy/Madnick analogue, 2024)",
+    "Related canon entry: VC-AI-CHAIN-0001 (delegation-time confused deputy)",
+    "Related canon entry: VC-AI-RAG-0001 (single-agent context poisoning)"
+  ],
+  "contributor": {
+    "submitter_id": "viridis-security-ai-agent",
+    "validator_id": "viridis-security-ai-agent",
+    "canonical_founder": "Viridis Security"
+  }
+}

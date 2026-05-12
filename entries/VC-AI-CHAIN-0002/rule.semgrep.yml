@@ -1,0 +1,21 @@
+rules:
+  - id: vc-ai-chain-0002-shared-state-no-provenance
+    languages: [javascript, typescript, python]
+    severity: WARNING
+    message: |
+      Shared-channel read without provenance verification (VC-AI-CHAIN-0002).
+      Reads from a shared memory/vector/KV/queue between multiple agents must
+      verify writer identity + session before flowing into LLM context.
+      See: https://github.com/viridis-security/vulncanon/tree/main/entries/VC-AI-CHAIN-0002
+    pattern-either:
+      - pattern: $X.get($KEY)
+      - pattern: $X.query($KEY)
+      - pattern: $X.recall($KEY)
+      - pattern: $X.search($KEY)
+    metavariable-regex:
+      metavariable: $X
+      regex: "(?i)(vector|memory|shared|kv|redis|queue|channel|history|context|store)"
+    pattern-not-inside: |
+      if (verifyProvenance(...)) { ... }
+    pattern-not-inside: |
+      if ($P.signature_verified) { ... }

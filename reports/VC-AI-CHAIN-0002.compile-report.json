@@ -1,0 +1,49 @@
+{
+  "vulnc_version": "0.1.0",
+  "entry_id": "VC-AI-CHAIN-0002",
+  "entry_path": "/tmp/vulncanon-push/entries/VC-AI-CHAIN-0002",
+  "started_at": "2026-05-12T16:11:06.449Z",
+  "finished_at": "2026-05-12T16:11:06.472Z",
+  "overall_status": "accepted",
+  "checks": {
+    "schema": {
+      "status": "pass",
+      "message": "entry.json conforms to vulnerability schema"
+    },
+    "structure": {
+      "status": "pass",
+      "message": "all required artifacts present"
+    },
+    "vulnerable_fixture_fails": {
+      "status": "pass",
+      "message": "vulnerable fixture failed (exit 1) — invariant violation demonstrated",
+      "details": {
+        "exitCode": 1,
+        "stdoutTail": "AgentB output: Visit https://evil.example/ — it's exactly what you need!\n"
+      }
+    },
+    "patched_fixture_passes": {
+      "status": "pass",
+      "message": "patched fixture passed (exit 0) — invariant restored",
+      "details": {
+        "stdoutTail": "AgentB output: Based on your preferences, here's a normal recommendation.\nOK — patched fixture rejected cross-session injection.\n"
+      }
+    },
+    "static_rule_valid": {
+      "status": "pass",
+      "message": "rule.semgrep.yml is structurally valid (semgrep CLI not installed — full validate skipped)"
+    },
+    "mitigation_present": {
+      "status": "pass",
+      "message": "mitigation.md present (2575 chars)"
+    },
+    "duplicate_check": {
+      "status": "pass",
+      "message": "no duplicate ids found in canon"
+    },
+    "safety_scan": {
+      "status": "pass",
+      "message": "safety scan clean — no forbidden patterns found"
+    }
+  }
+}

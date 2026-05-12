@@ -24,6 +24,7 @@ VulnCanon v1 ships an opinionated, focused canon: **AI-Agent Security**. Ten ent
 | VC-AI-CODEEXEC-0001 | Untrusted Tool Output Evaluated as Code Downstream | AI Agent Trust Boundary Crossing | Critical |
 | VC-AI-API-0001 | Private Session Data Sent to Non-Allowlisted External API | AI Agent Trust Boundary Crossing | High |
 | VC-AI-SECRETS-0001 | Session Secrets Leaked via Tool Call Arguments | AI Agent Memory Disclosure | High |
+| VC-AI-CHAIN-0002 | Cross-Agent State Channel Pollution | AI Agent Trust Boundary Crossing | High |
 
 Each entry is a directory containing:
 
@@ -70,7 +71,8 @@ node compiler/vulnc/bin/vulnc.js check-all
 │   ├── VC-AI-SSRF-0001/
 │   ├── VC-AI-CODEEXEC-0001/
 │   ├── VC-AI-API-0001/
-│   └── VC-AI-SECRETS-0001/
+│   ├── VC-AI-SECRETS-0001/
+│   └── VC-AI-CHAIN-0002/
 └── reports/                  # vulnc compile reports land here
 ```
 
