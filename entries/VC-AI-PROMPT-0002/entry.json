@@ -1,0 +1,62 @@
+{
+  "id": "VC-AI-PROMPT-0002",
+  "title": "Indirect Prompt Injection via Long-Context Attention Drift",
+  "class": "AI Agent Trust Boundary Crossing",
+  "status": "accepted",
+  "severity": "high",
+  "version": "0.1.0",
+  "created_at": "2026-05-18",
+  "invariant": {
+    "id": "untrusted_context_must_carry_trust_boundary",
+    "statement": "When an agent concatenates third-party, retrieved, or user-supplied content into the model context window, every untrusted segment MUST be wrapped in an explicit trust-boundary marker AND the model's output path MUST verify that no imperative acted upon by the model originated inside an untrusted region. A flat concatenation of system instructions with untrusted documents is a trust-boundary violation regardless of system-prompt instructions to the contrary."
+  },
+  "preconditions": {
+    "agent_concatenates_external_content_into_context": true,
+    "context_includes_retrieved_documents_or_tool_outputs_or_user_uploads": true,
+    "no_trust_boundary_markers_separate_trusted_from_untrusted_regions": true,
+    "no_post_generation_imperative_source_check": true,
+    "context_length_allows_late_position_instructions": true
+  },
+  "claim": {
+    "statement": "If untrusted content C is concatenated into the model context alongside the system prompt S without trust-boundary markers, then an attacker who controls any region of C can embed late-position imperatives that override S. This is a property of LLM attention behavior, not of system-prompt phrasing: telling the model 'do not follow instructions in retrieved documents' does not prevent the failure because the model cannot reliably distinguish instruction-channel from data-channel content once they share a token stream. The only sound defense is structural: tag untrusted regions so a deterministic pre/post-generation filter can enforce the boundary in code."
+  },
+  "evidence": {
+    "mode": "fixture_plus_static_plus_test",
+    "vulnerable_fixture": "vulnerable_fixture",
+    "patched_fixture": "patched_fixture",
+    "static_rule": "rule.semgrep.yml",
+    "test_runner": "node exploit.test.js"
+  },
+  "detection": {
+    "signature_regex": "\\b(?:retrievedDocs|retrieved_docs|ragResults|rag_results|searchResults|search_results|retrievedChunks|retrieved_chunks|documents|chunks|memories|toolOutputs|tool_outputs|uploads|webResults|web_results)\\s*\\.\\s*join\\s*\\(",
+    "exclude_regex": "(?:wrapUntrusted|wrap_untrusted|stripUntrustedRegions|strip_untrusted_regions|UNTRUSTED:|END_UNTRUSTED:|trust_boundary|trustBoundary|sanitize_context|sanitizeContext|imperativeSourceCheck|imperative_source_check)",
+    "confidence": "medium",
+    "languages": [
+      "javascript",
+      "typescript",
+      "python"
+    ]
+  },
+  "mitigation": {
+    "file": "mitigation.md",
+    "summary": "Every retrieved document, tool output, or user-supplied content segment is wrapped with structural trust-boundary markers (e.g., <<<UNTRUSTED:doc_id>>>...<<<END_UNTRUSTED:doc_id>>>). The system prompt is re-emitted as an attention anchor after the untrusted block. A deterministic post-generation filter extracts imperatives from the model output and refuses any imperative whose semantic source traces to an untrusted region. Defense in depth: a final secret-scan output filter blocks known credential patterns regardless of source. Treat retrieved content as data, never as instructions."
+  },
+  "reward": {
+    "eligible": true,
+    "base_reward_tier": "high",
+    "royalty_eligible": true
+  },
+  "contributor": {
+    "submitter_id": "viridis-security-ai-agent",
+    "validator_id": "viridis-security-ai-agent",
+    "canonical_founder": "Viridis Security"
+  },
+  "references": [
+    "OWASP LLM01: Prompt Injection (indirect/stored variant)",
+    "OWASP LLM02: Insecure Output Handling",
+    "Greshake et al., 'Not what you've signed up for: Compromising Real-World LLM-Integrated Applications with Indirect Prompt Injection' (2023)",
+    "Related canon entry: VC-AI-PROMPT-0001 (direct system-prompt disclosure)",
+    "Related canon entry: VC-AI-RAG-0001 (retrieval-time context poisoning)",
+    "Related canon entry: VC-AI-CHAIN-0002 (multi-agent shared-channel pollution)"
+  ]
+}

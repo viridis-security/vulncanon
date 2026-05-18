@@ -1,0 +1,26 @@
+rules:
+  - id: vulncanon-ai-prompt-0002-untagged-untrusted-context-concat
+    message: |
+      Retrieved/untrusted documents are concatenated into the model context
+      without trust-boundary tags or a pre-generation imperative scrub.
+      VC-AI-PROMPT-0002: indirect prompt injection via long-context attention
+      drift. Wrap every untrusted segment in <<<UNTRUSTED:id>>>...<<<END_UNTRUSTED:id>>>
+      markers and strip those regions before scanning the context for
+      imperatives; add an output-side credential filter as defense in depth.
+    severity: WARNING
+    languages: [javascript, typescript]
+    metadata:
+      canon_id: VC-AI-PROMPT-0002
+      cwe: "CWE-77"
+      owasp_llm: "LLM01"
+      references:
+        - https://canon.viridis-security.com/entries/VC-AI-PROMPT-0002
+    pattern-either:
+      - pattern: |
+          $DOCS.join(...)
+      - pattern: |
+          $CTX + $DOCS.join(...)
+    pattern-not:
+      - pattern: wrapUntrusted(...)
+      - pattern: stripUntrustedRegions(...)
+      - pattern: outputSecretFilter(...)

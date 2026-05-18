@@ -1,0 +1,49 @@
+{
+  "vulnc_version": "0.1.0",
+  "entry_id": "VC-AI-PROMPT-0002",
+  "entry_path": "/sessions/relaxed-sweet-edison/mnt/Viridis-Bounty-Hunter- 2.0/canon/vulncanon/entries/VC-AI-PROMPT-0002",
+  "started_at": "2026-05-18T15:02:55.109Z",
+  "finished_at": "2026-05-18T15:02:55.141Z",
+  "overall_status": "accepted",
+  "checks": {
+    "schema": {
+      "status": "pass",
+      "message": "entry.json conforms to vulnerability schema"
+    },
+    "structure": {
+      "status": "pass",
+      "message": "all required artifacts present"
+    },
+    "vulnerable_fixture_fails": {
+      "status": "pass",
+      "message": "vulnerable fixture failed (exit 1) — invariant violation demonstrated",
+      "details": {
+        "exitCode": 1,
+        "stdoutTail": ""
+      }
+    },
+    "patched_fixture_passes": {
+      "status": "pass",
+      "message": "patched fixture passed (exit 0) — invariant restored",
+      "details": {
+        "stdoutTail": "OK — invariant holds (output: \"(generic answer about: What is the capital of France?)\")\n"
+      }
+    },
+    "static_rule_valid": {
+      "status": "pass",
+      "message": "rule.semgrep.yml is structurally valid (semgrep CLI not installed — full validate skipped)"
+    },
+    "mitigation_present": {
+      "status": "pass",
+      "message": "mitigation.md present (3670 chars)"
+    },
+    "duplicate_check": {
+      "status": "pass",
+      "message": "no duplicate ids found in canon"
+    },
+    "safety_scan": {
+      "status": "pass",
+      "message": "safety scan clean — no forbidden patterns found"
+    }
+  }
+}
