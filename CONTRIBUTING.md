@@ -22,6 +22,11 @@ The fixture must:
 - Be the **minimum** code that exhibits the pattern. Strip everything that isn't load-bearing.
 - Avoid live targets. No real URLs. No real keys. The fixture demonstrates the pattern; it does not exploit anything in the world.
 
+Secrets in both vulnerable and patched fixtures must use obviously fake markers (for example,
+`sk_test_EXAMPLE…`). Never use real credentials, even in fixtures. Gitleaks retains its default
+rules and allowlists only paths matching `^entries/[^/]+/(vulnerable|patched)_fixture/` for
+synthetic fixture credentials; files outside those paths remain scanned.
+
 ### 4. Write the regression test
 
 `vulnerable_fixture/exploit.test.js` calls the vulnerable code path and asserts the invariant. The assertion must fail — Node exits non-zero. This is the proof-of-non-hypothesis.
