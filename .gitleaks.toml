@@ -1,0 +1,6 @@
+[extend]
+useDefault = true
+
+[allowlist]
+description = "Synthetic credentials in vulnerability fixtures only"
+paths = ['''^entries/[^/]+/(vulnerable|patched)_fixture/''']
