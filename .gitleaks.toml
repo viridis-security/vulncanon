@@ -4,3 +4,9 @@ useDefault = true
 [allowlist]
 description = "Synthetic credentials in vulnerability fixtures only"
 paths = ['''^entries/[^/]+/(vulnerable|patched)_fixture/''']
+
+[[rules]]
+id = "openai-api-key-modern"
+description = "OpenAI API key in project, service-account or admin format"
+regex = '''\bsk-(?:proj|svcacct|admin)-[A-Za-z0-9_-]{40,}'''
+keywords = ["sk-proj-", "sk-svcacct-", "sk-admin-"]
