@@ -10,7 +10,7 @@ A code pattern is a *hypothesis*. Only a compiled artifact — vulnerable fixtur
 
 ## What's in v1
 
-VulnCanon v1 ships an opinionated, focused canon: **AI-Agent Security**. Ten entries cover the dominant failure modes of LLM-based agent systems:
+VulnCanon v1 ships an opinionated, focused canon: **AI-Agent Security**. Twelve entries cover the dominant failure modes of LLM-based agent systems:
 
 | ID | Title | Class | Severity |
 |---|---|---|---|
@@ -19,6 +19,7 @@ VulnCanon v1 ships an opinionated, focused canon: **AI-Agent Security**. Ten ent
 | VC-AI-MEM-0001 | Cross-Tenant Memory Disclosure in Agent Long-Term Store | AI Agent Memory Disclosure | High |
 | VC-AI-ACTION-0001 | Irreversible Action Executed Without Confirmation | AI Agent Irreversible Action | High |
 | VC-AI-PROMPT-0001 | System Instruction Disclosure via Output Reflection | AI Agent System Prompt Disclosure | Medium |
+| VC-AI-PROMPT-0002 | Indirect Prompt Injection via Long-Context Attention Drift | AI Agent Trust Boundary Crossing | High |
 | VC-AI-CHAIN-0001 | Multi-Agent Delegation Expands Permission Scope | AI Agent Authorization Failure | High |
 | VC-AI-SSRF-0001 | Agent-Coerced SSRF to Internal and Metadata Endpoints | AI Agent Trust Boundary Crossing | Critical |
 | VC-AI-CODEEXEC-0001 | Untrusted Tool Output Evaluated as Code Downstream | AI Agent Trust Boundary Crossing | Critical |
@@ -67,6 +68,7 @@ node compiler/vulnc/bin/vulnc.js check-all
 │   ├── VC-AI-MEM-0001/
 │   ├── VC-AI-ACTION-0001/
 │   ├── VC-AI-PROMPT-0001/
+│   ├── VC-AI-PROMPT-0002/
 │   ├── VC-AI-CHAIN-0001/
 │   ├── VC-AI-SSRF-0001/
 │   ├── VC-AI-CODEEXEC-0001/
@@ -102,7 +104,9 @@ VulnCanon is the supply-side moat. Viridis-Bounty-Hunter is the supply mechanism
 
 ## Status
 
-v0.1.0 (first public release) — ten entries, all `vulnc check-all` ACCEPTED, all per-entry self-scan differentials hold.
+v0.1.0 was the first public release. The current source tree contains twelve entries.
+Run `vulnc check-all` against your checkout to obtain its compile reports; the entry
+count alone does not establish compilation or self-scan acceptance.
 
 ## License
 
